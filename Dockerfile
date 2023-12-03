@@ -1,11 +1,13 @@
-FROM golang:1.17-alpine as BUILD
+FROM golang:1.21-alpine as BUILD
+WORKDIR /src
 
-WORKDIR /src/
-COPY . /src/
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
 
-RUN go mod tidy
+COPY . .
 RUN CGO_ENABLED=0 go build -o /bin/app .
 
-FROM alpine
+FROM gcr.io/distroless/static:nonroot
 COPY --from=BUILD /bin/app /bin/app
 ENTRYPOINT [ "/bin/app" ]

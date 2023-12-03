@@ -2,75 +2,94 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/adityak74/google-drive-upload-git-action)](https://goreportcard.com/report/github.com/adityak74/google-drive-upload-git-action)
 
 # google-drive-upload-git-action
-Github action that uploads files to Google Drive.
+
+GitHub action that uploads files to Google Drive.
 **This only works with a Google Service Account!**
 
-Thanks to [Team Tumbleweed](https://github.com/team-tumbleweed) for developing the initial version of this actions package.
+Thanks to [Team Tumbleweed](https://github.com/team-tumbleweed) for developing the initial version of this actions
+package.
 
-To make a GSA go to the [Credentials Dashboard](https://console.cloud.google.com/apis/credentials). You will need to download the **.json key** and base64 encode it. You will use this string as the `credentials` input. To convert the *json* file to base64 without having to use an online tool (which is insecure), use this command:
+To make a GSA go to the [Credentials Dashboard](https://console.cloud.google.com/apis/credentials). You will need to
+download the **.json key** and base64 encode it. You will use this string as the `credentials` input. To convert the
+*json* file to base64 without having to use an online tool (which is insecure), use this command:
 
-`base64 credentials.json -w0`
+`base64 -i credentials.json`
 
-On mac this the base64 by default opts for -w as 0, you can skip and just use base64 without any params.
+You will also need to **share the drive with the servie account.** To do this, just share the folder like you would
+normally with a friend, except you share it with the service account email address. Additionally, you will need to give
+the service account access to the Google Drive API.
+Go to `https://console.developers.google.com/apis/api/drive.googleapis.com/overview?project={PROJECT_ID}`.
+Where `{PROJECT_ID}` is the id of your GCP project. Find more info about
+that [here.](https://support.google.com/googleapi/answer/7014113?hl=en)
 
-You will also need to **share the drive with the servie account.** To do this, just share the folder like you would normally with a friend, except you share it with the service account email address. Additionally you will need to give the service account acccess to the google drive API. 
-Go to `https://console.developers.google.com/apis/api/drive.googleapis.com/overview?project={PROJECT_ID}`. Where `{PROJECT_ID}` is the id of your GCP project. Find more info about that [here.](https://support.google.com/googleapi/answer/7014113?hl=en)
+## Inputs
 
-# Inputs
+### `filename`
 
-## ``filename``
-Required: **YES**.  
+Required: **YES**.
 
 The name of the file you want to upload. Wildcards can be used to upload more than one file.
 
-## ``name``
+### `name`
+
 Required: **NO**
 
-The name you want the file to have in Google Drive. If this input is not provided, it will use only the filename of the source path. It will be ignored if there are more than one file to be uploaded.
+The name you want the file to have in Google Drive. If this input is not provided, it will use only the filename of the
+source path. It will be ignored if there are more than one file to be uploaded.
 
-## ``overwrite``
+### `overwrite`
+
 Required: **NO**
 
 If you want to overwrite the filename with existing file, it will use the target filename.
-## ``mimeType``
+
+### `mimeType`
+
 Required: **NO**
 
 file MimeType. If absent, Google Drive will attempt to automatically detect an appropriate value.
 
-## ``useCompleteSourceFilenameAsName``
+### `useCompleteSourceFilenameAsName`
+
 Required: **NO**
 
 If true, the target file name will be the complete source filename and `name` parameter will be ignored.
 
-## ``mirrorDirectoryStructure``
+### `mirrorDirectoryStructure`
+
 Required: **NO**
 
-If true, the directory structure of the source file will be recreated relative to ``folderId``.
+If true, the directory structure of the source file will be recreated relative to `folderId`.
 
-## ``namePrefix``
+### `namePrefix`
+
 Required: **NO**
 
 Prefix to be added to target filename.
 
-## ``folderId``
-Required: **YES**. 
+### `folderId`
 
-The [ID of the folder](https://ploi.io/documentation/database/where-do-i-get-google-drive-folder-id) you want to upload to.
-
-## ``credentials``
 Required: **YES**.
 
-A base64 encoded string with the [GSA credentials](https://stackoverflow.com/questions/46287267/how-can-i-get-the-file-service-account-json-for-google-translate-api/46290808).
+The [ID of the folder](https://ploi.io/documentation/database/where-do-i-get-google-drive-folder-id) you want to upload
+to.
 
+### `credentials`
 
-# Usage Example
+Required: **YES**.
 
-## Simple Workflow
-In this example we stored the folderId and credentials as action secrets. This is highly recommended as leaking your credentials key will allow anyone to use your service account.
+A base64 encoded string with
+the [GSA credentials](https://stackoverflow.com/questions/46287267/how-can-i-get-the-file-service-account-json-for-google-translate-api/46290808).
+
+## Example usage
+
+In this example we stored the folderId and credentials as action secrets. This is highly recommended as leaking your
+credentials key will allow anyone to use your service account.
+
 ```yaml
 # .github/workflows/main.yml
 name: Main
-on: [push]
+on: [ push ]
 
 jobs:
   my_job:
@@ -107,5 +126,5 @@ jobs:
           folderId: ${{ secrets.folderId }}
           overwrite: "true"
           mirrorDirectoryStructure: "true"
-          
+
 ```
