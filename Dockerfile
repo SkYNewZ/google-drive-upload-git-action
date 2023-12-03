@@ -8,6 +8,6 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -o /bin/app .
 
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static
 COPY --from=BUILD /bin/app /bin/app
 ENTRYPOINT [ "/bin/app" ]

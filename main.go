@@ -27,10 +27,10 @@ const (
 	nameInput                     = "name"
 	folderIdInput                 = "folderId"
 	credentialsInput              = "credentials"
-	overwriteInput                = "false"
+	overwriteInput                = "overwrite"
 	mimeTypeInput                 = "mimeType"
 	useCompleteSourceName         = "useCompleteSourceFilenameAsName"
-	mirrorDirectoryStructureInput = "mirrorDirectoryStructureInput"
+	mirrorDirectoryStructureInput = "mirrorDirectoryStructure"
 	namePrefixInput               = "namePrefix"
 )
 
@@ -94,7 +94,7 @@ func main() {
 	var overwriteFlag bool
 	overwrite := githubactions.GetInput(overwriteInput)
 	if overwrite == "" {
-		githubactions.Warningf("%s is disabled.", overwriteInput)
+		githubactions.Infof("%s is disabled.", overwriteInput)
 		overwriteFlag = false
 	} else {
 		overwriteFlag, _ = strconv.ParseBool(overwrite)
@@ -175,6 +175,10 @@ func main() {
 				if err != nil {
 					githubactions.Fatalf("creating directory %s failed with error: %s", dir, err)
 				}
+
+				// set the folderId output. Useful when creating a folder structure
+				// TODO: Find a way to set the folderId output only once. Currently is print the last folderId
+				githubactions.SetOutput("folderId", folderId)
 			}
 		}
 
@@ -197,6 +201,8 @@ func main() {
 			githubactions.Fatalf("uploading file failed with error: %s", err)
 		}
 	}
+
+	githubactions.Infof("Successfully uploaded file(s) to Google Drive.")
 }
 
 func createDriveDirectory(svc *drive.Service, folderId string, name string) (string, error) {
